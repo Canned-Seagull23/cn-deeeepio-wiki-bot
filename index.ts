@@ -1,9 +1,14 @@
 const bot = require('nodemw');
 
-// pass configuration object
-const client = new bot("config.js");
+// Create client
+const client = new bot("config.json");
 
-client.getArticle('小丑鱼', (err: Error, data: any) => {
+client.logIn((err: Error) => {
+    if (err) console.error(err);
+    console.log("Client logged in");
+});
+
+client.getArticle("机械人测试", (err: Error, data: any) => {
     // error handling
     if (err) {
         console.error(err);
