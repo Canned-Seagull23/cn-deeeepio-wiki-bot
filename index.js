@@ -23,9 +23,9 @@ const CDWB_TAGS = {
             start: "skintable/all/start",
             end: "skintable/all/end"
         },
-        normal: {
-            start: "skintable/normal/start",
-            end: "skintable/normal/end"
+        realistic: {
+            start: "skintable/realistic/start",
+            end: "skintable/realistic/end"
         },
         seasonal: {
             start: "skintable/seasonal/start",
@@ -174,33 +174,54 @@ function appendArticlePromise(title, content, summary) {
         const startln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.start)[0].line;
         const endln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.end)[0].line;
         const table = lines.slice(startln + 1, endln - 1);
-        const normalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.normal.start)[0].line;
-        const normalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.normal.end)[0].line;
-        const normalSection = lines.slice(normalStartLn + 1, normalEndLn - 1);
-        let normalSkinEntries = [];
-        let normalRow = [];
-        for (let i in normalSection) {
-            if (normalSection[i] == "|-" || normalSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
-                normalSkinEntries.push(normalRow);
+        const realisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.realistic.start)[0].line;
+        const realisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.realistic.end)[0].line;
+        const realisticSection = lines.slice(realisticStartLn + 1, realisticEndLn - 1);
+        let realisticSkinEntries = [];
+        let realisticRow = [];
+        for (let i in realisticSection) {
+            if (realisticSection[i] == "|-" || realisticSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
+                realisticSkinEntries.push(realisticRow);
+                realisticRow = [];
                 continue;
             }
             else {
-                normalRow.push(normalSection[i]);
+                realisticRow.push(realisticSection[i]);
             }
             ;
         }
-        console.log(normalSkinEntries);
         const seasonalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.start)[0].line;
         const seasonalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.end)[0].line;
         const seasonalSection = lines.slice(seasonalStartLn + 1, seasonalEndLn - 1);
+        let seasonalSkinEntries = [];
+        let seasonalRow = [];
+        for (let i in seasonalSection) {
+            if (seasonalSection[i] == "|-" || seasonalSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
+                seasonalSkinEntries.push(seasonalRow);
+                seasonalRow = [];
+                continue;
+            }
+            else {
+                seasonalRow.push(seasonalSection[i]);
+            }
+            ;
+        }
         const unrealisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.start)[0].line;
         const unrealisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.end)[0].line;
         const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn - 1);
-        /*
-                console.log(table)
-                console.log(normalStartLn)
-                console.log(normalEndLn)
-                console.log(normalSection)*/
+        let unrealisticSkinEntries = [];
+        let unrealisticRow = [];
+        for (let i in unrealisticSection) {
+            if (unrealisticSection[i] == "|-" || unrealisticSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
+                unrealisticSkinEntries.push(unrealisticRow);
+                unrealisticRow = [];
+                continue;
+            }
+            else {
+                unrealisticRow.push(unrealisticSection[i]);
+            }
+            ;
+        }
     }
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
