@@ -152,9 +152,6 @@ function appendArticlePromise(title, content, summary) {
     realisticSkins = skins.filter(skin => skin.category == "real");
     seasonalSkins = skins.filter(skin => skin.category == "season");
     unrealisticSkins = skins.filter(skin => skin.category == "unrealistic");
-    console.log(realisticSkins);
-    console.log(seasonalSkins);
-    console.log(unrealisticSkins);
     let d = yield getArticlePromise("机械人测试");
     console.log(d);
     const lines = d.split('\n');
@@ -174,6 +171,7 @@ function appendArticlePromise(title, content, summary) {
         const startln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.start)[0].line;
         const endln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.end)[0].line;
         const table = lines.slice(startln + 1, endln - 1);
+        let documentedSkins = [];
         const realisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.realistic.start)[0].line;
         const realisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.realistic.end)[0].line;
         const realisticSection = lines.slice(realisticStartLn + 1, realisticEndLn - 1);
@@ -189,6 +187,11 @@ function appendArticlePromise(title, content, summary) {
                 realisticRow.push(realisticSection[i]);
             }
             ;
+        }
+        for (let i in realisticSkinEntries) {
+            if (isNaN(realisticSkinEntries[i][2].slice(1)))
+                continue;
+            documentedSkins.push(Number(realisticSkinEntries[i][2].slice(1)));
         }
         const seasonalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.start)[0].line;
         const seasonalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.end)[0].line;
@@ -206,6 +209,11 @@ function appendArticlePromise(title, content, summary) {
             }
             ;
         }
+        for (let i in seasonalSkinEntries) {
+            if (isNaN(seasonalSkinEntries[i][2].slice(1)))
+                continue;
+            documentedSkins.push(Number(seasonalSkinEntries[i][2].slice(1)));
+        }
         const unrealisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.start)[0].line;
         const unrealisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.end)[0].line;
         const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn - 1);
@@ -222,6 +230,12 @@ function appendArticlePromise(title, content, summary) {
             }
             ;
         }
+        for (let i in unrealisticSkinEntries) {
+            if (isNaN(unrealisticSkinEntries[i][2].slice(1)))
+                continue;
+            documentedSkins.push(Number(unrealisticSkinEntries[i][2].slice(1)));
+        }
+        console.log(documentedSkins);
     }
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
