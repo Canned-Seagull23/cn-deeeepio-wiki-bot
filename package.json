@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/Canned-Seagull23/cn-deeeepio-wiki-bot#readme",
   "dependencies": {
-    "instaview": "^0.6.3",
     "nodemw": "^0.18.0"
   }
 }
