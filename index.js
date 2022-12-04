@@ -34,6 +34,9 @@ const CDWB_TAGS = {
         unrealistic: {
             start: "skintable/unrealistic/start",
             end: "skintable/unrealistic/end"
+        },
+        table: {
+            end: "skintable/table/end"
         }
     }
 };
@@ -142,6 +145,9 @@ function appendArticlePromise(title, content, summary) {
     yield fetch(CONSTANTS.API_URL, "/skins?cat=all&animalId=" + animalId)
         .then((data) => {
         skins = JSON.parse(data);
+    }).catch(e => {
+        console.error(e);
+        console.log("Error loading skins");
     });
     realisticSkins = skins.filter(skin => skin.category == "real");
     seasonalSkins = skins.filter(skin => skin.category == "season");
@@ -171,16 +177,30 @@ function appendArticlePromise(title, content, summary) {
         const normalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.normal.start)[0].line;
         const normalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.normal.end)[0].line;
         const normalSection = lines.slice(normalStartLn + 1, normalEndLn - 1);
+        let normalSkinEntries = [];
+        let normalRow = [];
+        for (let i in normalSection) {
+            if (normalSection[i] == "|-" || normalSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
+                normalSkinEntries.push(normalRow);
+                continue;
+            }
+            else {
+                normalRow.push(normalSection[i]);
+            }
+            ;
+        }
+        console.log(normalSkinEntries);
         const seasonalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.start)[0].line;
         const seasonalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.end)[0].line;
         const seasonalSection = lines.slice(seasonalStartLn + 1, seasonalEndLn - 1);
         const unrealisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.start)[0].line;
         const unrealisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.end)[0].line;
         const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn - 1);
-        console.log(table);
-        console.log(normalStartLn);
-        console.log(normalEndLn);
-        console.log(normalSection);
+        /*
+                console.log(table)
+                console.log(normalStartLn)
+                console.log(normalEndLn)
+                console.log(normalSection)*/
     }
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
