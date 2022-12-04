@@ -22,6 +22,18 @@ const CDWB_TAGS = {
         all: {
             start: "skintable/all/start",
             end: "skintable/all/end"
+        },
+        normal: {
+            start: "skintable/normal/start",
+            end: "skintable/normal/end"
+        },
+        seasonal: {
+            start: "skintable/seasonal/start",
+            end: "skintable/seasonal/end"
+        },
+        unrealistic: {
+            start: "skintable/unrealistic/start",
+            end: "skintable/unrealistic/end"
         }
     }
 };
@@ -122,6 +134,21 @@ function appendArticlePromise(title, content, summary) {
         };
     }
         }*/
+    const animalId = 0;
+    let skins = [];
+    let realisticSkins = [];
+    let seasonalSkins = [];
+    let unrealisticSkins = [];
+    yield fetch(CONSTANTS.API_URL, "/skins?cat=all&animalId=" + animalId)
+        .then((data) => {
+        skins = JSON.parse(data);
+    });
+    realisticSkins = skins.filter(skin => skin.category == "real");
+    seasonalSkins = skins.filter(skin => skin.category == "season");
+    unrealisticSkins = skins.filter(skin => skin.category == "unrealistic");
+    console.log(realisticSkins);
+    console.log(seasonalSkins);
+    console.log(unrealisticSkins);
     let d = yield getArticlePromise("机械人测试");
     console.log(d);
     const lines = d.split('\n');
@@ -140,8 +167,20 @@ function appendArticlePromise(title, content, summary) {
         console.log('x');
         const startln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.start)[0].line;
         const endln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.end)[0].line;
-        const table = lines.slice(startln + 1, endln - 1).join('');
+        const table = lines.slice(startln + 1, endln - 1);
+        const normalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.normal.start)[0].line;
+        const normalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.normal.end)[0].line;
+        const normalSection = lines.slice(normalStartLn + 1, normalEndLn - 1);
+        const seasonalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.start)[0].line;
+        const seasonalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.end)[0].line;
+        const seasonalSection = lines.slice(seasonalStartLn + 1, seasonalEndLn - 1);
+        const unrealisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.start)[0].line;
+        const unrealisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.end)[0].line;
+        const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn - 1);
         console.log(table);
+        console.log(normalStartLn);
+        console.log(normalEndLn);
+        console.log(normalSection);
     }
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
