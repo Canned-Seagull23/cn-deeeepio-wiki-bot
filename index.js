@@ -20,7 +20,8 @@ const CONSTANTS = {
 const CDWB_TAGS = {
     skintable: {
         all: {
-            start: "skintable/all/start"
+            start: "skintable/all/start",
+            end: "skintable/all/end"
         }
     }
 };
@@ -128,11 +129,19 @@ function appendArticlePromise(title, content, summary) {
     for (let i in lines) {
         if (lines[i].startsWith("<!--@cdwb/")) {
             tags.push({
-                line: i,
+                line: Number(i),
                 tag: lines[i].slice(10, -3)
             });
         }
         ;
+    }
+    console.log(tags);
+    if (tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.start).length != 0) {
+        console.log('x');
+        const startln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.start)[0].line;
+        const endln = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.all.end)[0].line;
+        const table = lines.slice(startln + 1, endln - 1).join('');
+        console.log(table);
     }
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
