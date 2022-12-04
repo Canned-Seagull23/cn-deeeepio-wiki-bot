@@ -95,6 +95,7 @@ function appendArticlePromise(title, content, summary) {
     });
 }
 (() => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     yield fetch(CONSTANTS.API_URL, "/animals")
         .then((data) => {
         animals = JSON.parse(data);
@@ -139,6 +140,7 @@ function appendArticlePromise(title, content, summary) {
         }*/
     const animalId = 0;
     let skins = [];
+    let undocumentedSkins = [];
     let realisticSkins = [];
     let seasonalSkins = [];
     let unrealisticSkins = [];
@@ -235,7 +237,40 @@ function appendArticlePromise(title, content, summary) {
                 continue;
             documentedSkins.push(Number(unrealisticSkinEntries[i][2].slice(1)));
         }
-        console.log(documentedSkins);
+        for (let i in skins) {
+            if (!documentedSkins.includes(skins[i].id)) {
+                undocumentedSkins.push(skins[i]);
+            }
+            ;
+        }
+        for (let i in undocumentedSkins) {
+            const skin = undocumentedSkins[i];
+            let section = [];
+            if (undocumentedSkins[i].category == "real") {
+                section = realisticSection;
+            }
+            else if (undocumentedSkins[i].category == "season") {
+                section = seasonalSection;
+            }
+            else {
+                section = unrealisticSection;
+            }
+            ;
+            section.push([
+                `|[https://beta.deeeep.io/store/skins/${skin.id} 六線豆娘魚]`,
+                `[https://beta.deeeep.io/store/skins/${skin.id} ${skin.name}]`,
+                `|${skin.id}`,
+                `|${skin.user_username}`,
+                `|${skin.created_at.split('-')[0]}年${skin.created_at.split('-')[1]}月${skin.created_at.split('-')[2].split("T")[0]}日`,
+                `|${skin.price} [[File:Coin.png|15px|link=]]`,
+                `|${(_a = skin.attributes) !== null && _a !== void 0 ? _a : "无"}`,
+                `|一只身上有明显黑条纹，体型较大的豆娘鱼。它们经常群居于珊瑚上。`,
+                `|[[File:${skin.id}.png|100px|center]]`
+            ]);
+        }
+        console.log(realisticSection);
+        console.log(seasonalSection);
+        console.log(unrealisticSection);
     }
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
