@@ -97,37 +97,43 @@ function appendArticlePromise(title, content, summary) {
         console.log("Logging in failed");
     });
     // Get all animal articles
-    for (let i in Object.keys(animals)) {
-        const animalId = animals[i];
-        const animalName = translations[animalId.name + "-name"];
-        if (animalName === undefined)
-            continue;
-        console.log(animalName);
-        const data = yield getArticlePromise(animalName)
-            .catch(err => {
-            console.error(err);
-            console.log("Error fetching page " + animalName);
-        });
-        if (data === undefined)
-            continue;
-        console.log(data);
-        const splitd = data.split('\n');
-        for (let i in splitd) {
-            if (splitd[i].startsWith("<!--@cdwb/")) {
-                console.log(splitd[i].slice(10, -3));
-            }
-            ;
-        }
-    }
     /*
-        let d = await getArticlePromise("机械人测试");
-        console.log(d);
-        const splitd = d.split('\n')
-        for (let i in splitd) {
-            if (splitd[i].startsWith("<!--@cdwb/")) {
-                console.log(splitd[i].slice(10, -3));
-            };
+        for (let i in Object.keys(animals)) {
+            const animalId = animals[i];
+            const animalName = translations[animalId.name + "-name"];
+            if (animalName === undefined) continue;
+            console.log(animalName)
+            const data = await getArticlePromise(animalName)
+                .catch(err => {
+                    console.error(err);
+                    console.log("Error fetching page " + animalName);
+                });
+            if (data === undefined) continue;
+            console.log(data);
+            const lines = data.split('\n')
+                let tags = [];
+    for (let i in lines) {
+        if (lines[i].startsWith("<!--@cdwb/")) {
+            tags.push({
+                line: i,
+                tag: lines[i].slice(10, -3)
+            });
+        };
+    }
         }*/
+    let d = yield getArticlePromise("机械人测试");
+    console.log(d);
+    const lines = d.split('\n');
+    let tags = [];
+    for (let i in lines) {
+        if (lines[i].startsWith("<!--@cdwb/")) {
+            tags.push({
+                line: i,
+                tag: lines[i].slice(10, -3)
+            });
+        }
+        ;
+    }
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
             .then(res => {
