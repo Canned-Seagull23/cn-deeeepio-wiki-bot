@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Canned-Seagull23/cn-deeeepio-wiki-bot#readme",
   "dependencies": {
-    "nodemw": "^0.18.0"
+    "nodemw": "^0.18.0",
+    "request": "^2.88.2"
   }
 }
