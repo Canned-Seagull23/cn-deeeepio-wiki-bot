@@ -17,6 +17,13 @@ const CONSTANTS = {
     API_URL: "apibeta.deeeep.io",
     CROWDL_API_URL: "api.crowdl.io"
 };
+const CDWB_TAGS = {
+    skintable: {
+        all: {
+            start: "skintable/all/start"
+        }
+    }
+};
 // Data
 let translations = {};
 let animals = {};
@@ -93,18 +100,34 @@ function appendArticlePromise(title, content, summary) {
     for (let i in Object.keys(animals)) {
         const animalId = animals[i];
         const animalName = translations[animalId.name + "-name"];
+        if (animalName === undefined)
+            continue;
         console.log(animalName);
-        yield getArticlePromise(animalName)
-            .then(data => {
-            console.log(data);
-        })
+        const data = yield getArticlePromise(animalName)
             .catch(err => {
             console.error(err);
             console.log("Error fetching page " + animalName);
         });
+        if (data === undefined)
+            continue;
+        console.log(data);
+        const splitd = data.split('\n');
+        for (let i in splitd) {
+            if (splitd[i].startsWith("<!--@cdwb/")) {
+                console.log(splitd[i].slice(10, -3));
+            }
+            ;
+        }
     }
-    let d = yield getArticlePromise("机械人测试");
-    console.log(d);
+    /*
+        let d = await getArticlePromise("机械人测试");
+        console.log(d);
+        const splitd = d.split('\n')
+        for (let i in splitd) {
+            if (splitd[i].startsWith("<!--@cdwb/")) {
+                console.log(splitd[i].slice(10, -3));
+            };
+        }*/
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
             .then(res => {
