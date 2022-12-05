@@ -24,7 +24,6 @@
   "homepage": "https://github.com/Canned-Seagull23/cn-deeeepio-wiki-bot#readme",
   "dependencies": {
     "@translate-tools/core": "^0.2.10",
-    "nodemw": "^0.18.0",
-    "request": "^2.88.2"
+    "nodemw": "^0.18.0"
   }
 }
