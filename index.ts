@@ -1,5 +1,6 @@
 const bot = require('nodemw');
 const https = require('https');
+const { GoogleTranslator } = require('@translate-tools/core/translators/GoogleTranslator');
 
 // Create client
 const client = new bot("config.json");
@@ -7,7 +8,9 @@ const client = new bot("config.json");
 // Constants
 const CONSTANTS = {
     API_URL: "apibeta.deeeep.io",
-    CROWDL_API_URL: "api.crowdl.io"
+    CROWDL_API_URL: "api.crowdl.io",
+    TRANSLATE_SRC_LANG: "en",
+    TRANSLATE_TARGET_LANG: "zh"
 };
 const CDWB_TAGS = {
     skintable: {
@@ -145,12 +148,12 @@ function appendArticlePromise(title: string, content: string, summary: string): 
     let unrealisticSkins: Array<any> = [];
 
     await fetch(CONSTANTS.API_URL, "/skins?cat=all&animalId=" + animalId)
-    .then((data: string) => {
-        skins = JSON.parse(data);
-    }).catch(e => {
-        console.error(e);
-        console.log("Error loading skins");
-    });
+        .then((data: string) => {
+            skins = JSON.parse(data);
+        }).catch(e => {
+            console.error(e);
+            console.log("Error loading skins");
+        });
 
     realisticSkins = skins.filter(skin => skin!.category == "real");
     seasonalSkins = skins.filter(skin => skin!.category == "season");
@@ -189,7 +192,7 @@ function appendArticlePromise(title: string, content: string, summary: string): 
         let realisticSkinEntries: Array<any> = [];
         let realisticRow: Array<any> = [];
         for (let i in realisticSection) {
-            if (realisticSection[i] == "|-" || realisticSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
+            if (realisticSection[i] == "|-"  || Number(i) == realisticSection.length - 1) {
                 realisticSkinEntries.push(realisticRow);
                 realisticRow = [];
                 continue;
@@ -211,7 +214,7 @@ function appendArticlePromise(title: string, content: string, summary: string): 
         let seasonalSkinEntries: Array<any> = [];
         let seasonalRow: Array<any> = [];
         for (let i in seasonalSection) {
-            if (seasonalSection[i] == "|-" || seasonalSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
+            if (seasonalSection[i] == "|-" || Number(i) == seasonalSection.length - 1) {
                 seasonalSkinEntries.push(seasonalRow);
                 seasonalRow = [];
                 continue;
@@ -225,14 +228,16 @@ function appendArticlePromise(title: string, content: string, summary: string): 
             documentedSkins.push(Number(seasonalSkinEntries[i][2].slice(1)));
         }
 
+        console.log(documentedSkins)
+
         const unrealisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.start)[0]!.line;
         const unrealisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.end)[0]!.line;
         const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn - 1);
-        
+
         let unrealisticSkinEntries: Array<any> = [];
         let unrealisticRow: Array<any> = [];
         for (let i in unrealisticSection) {
-            if (unrealisticSection[i] == "|-" || unrealisticSection[i] == "<!--@cdwb/" + CDWB_TAGS.skintable.table.end + "-->") {
+            if (unrealisticSection[i] == "|-" || Number(i) == unrealisticSection.length - 1) {
                 unrealisticSkinEntries.push(unrealisticRow);
                 unrealisticRow = [];
                 continue;
@@ -254,6 +259,12 @@ function appendArticlePromise(title: string, content: string, summary: string): 
 
         for (let i in undocumentedSkins) {
             const skin = undocumentedSkins[i];
+            let skinData: any = {};
+            await fetch(CONSTANTS.API_URL, "/skins/" + skin.id)
+                .then((data: string) => {
+                    skinData = JSON.parse(data);
+                });
+
             let section: Array<any> = [];
             if (undocumentedSkins[i].category == "real") {
                 section = realisticSection;
@@ -262,15 +273,29 @@ function appendArticlePromise(title: string, content: string, summary: string): 
             } else {
                 section = unrealisticSection;
             };
-            section.push([
-                `|[https://beta.deeeep.io/store/skins/${skin.id} 六線豆娘魚]`,
+
+            const translator = new GoogleTranslator({
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',
+                },
+            });
+            const skinName = await translator
+                .translate(skin.name, CONSTANTS.TRANSLATE_SRC_LANG, CONSTANTS.TRANSLATE_TARGET_LANG);
+        
+            const skinDesc = await translator
+                .translate(skinData.description, CONSTANTS.TRANSLATE_SRC_LANG, CONSTANTS.TRANSLATE_TARGET_LANG);
+        console.log(skinDesc)
+            section.push(...[
+                `|-`,
+                `|[https://beta.deeeep.io/store/skins/${skin.id} （自动翻译） ${skinName}]`,
                 `[https://beta.deeeep.io/store/skins/${skin.id} ${skin.name}]`,
                 `|${skin.id}`,
                 `|${skin.user_username}`,
                 `|${skin.created_at.split('-')[0]}年${skin.created_at.split('-')[1]}月${skin.created_at.split('-')[2].split("T")[0]}日`,
                 `|${skin.price} [[File:Coin.png|15px|link=]]`,
                 `|${skin.attributes ?? "无"}`,
-                `|一只身上有明显黑条纹，体型较大的豆娘鱼。它们经常群居于珊瑚上。`, //TODO: DESCRIPTION
+                `|（自动翻译） ${skinDesc}`, //TODO: DESCRIPTION
                 `|[[File:${skin.id}.png|100px|center]]`
             ]);
         }
@@ -280,7 +305,6 @@ function appendArticlePromise(title: string, content: string, summary: string): 
         console.log(unrealisticSection);
 
     }
-
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
             .then(res => {
