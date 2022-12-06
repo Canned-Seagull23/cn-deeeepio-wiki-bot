@@ -305,19 +305,22 @@ function uploadByUrlPromise(name, url, summary) {
                 `|（自动翻译） ${skinDesc}`,
                 `|[[File:${skin.id}.png|100px|center]]`
             ]);
-            // await uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
+            yield uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
         }
-        console.log(undocumentedSkins);
         let offset = 0;
         lines.splice(realisticStartLn + 1, realisticEndLn - realisticStartLn - 1, ...realisticSection);
         offset += realisticSection.length - (realisticEndLn - realisticStartLn - 1);
         lines.splice(seasonalStartLn + 1 + offset, seasonalEndLn - seasonalStartLn - 1, ...seasonalSection);
         offset += seasonalSection.length - (seasonalEndLn - seasonalStartLn - 1);
         lines.splice(unrealisticStartLn + 1 + offset, unrealisticEndLn - unrealisticStartLn - 1, ...unrealisticSection);
-        editSummary += `<@cdwb/${CDWB_TAGS.edit.skins.add}|${undocumentedSkins}>.`;
+        let undocumentedCodes = [];
+        for (let i in undocumentedSkins) {
+            undocumentedCodes.push(undocumentedSkins[i].id);
+        }
+        editSummary += `<@cdwb/${CDWB_TAGS.edit.skins.add}|${undocumentedCodes}>.`;
     }
     console.log(lines.join('\n'));
-    //await editArticlePromise("机械人测试", lines.join('\n'), editSummary, false);
+    yield editArticlePromise("机械人测试", lines.join('\n'), editSummary, false);
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
             .then(res => {

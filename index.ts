@@ -320,12 +320,9 @@ function uploadByUrlPromise(name: string, url: string, summary: string): Promise
                 `|[[File:${skin.id}.png|100px|center]]`
             ]);
 
-           // await uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
+           await uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
 
         }
-
-        console.log(undocumentedSkins);
-
         let offset = 0;
 
         lines.splice(
@@ -350,11 +347,16 @@ function uploadByUrlPromise(name: string, url: string, summary: string): Promise
             ...unrealisticSection
         );
 
-        editSummary += `<@cdwb/${CDWB_TAGS.edit.skins.add}|${undocumentedSkins}>.`;
+        let undocumentedCodes = [];
+        for (let i in undocumentedSkins) {
+            undocumentedCodes.push(undocumentedSkins[i].id);
+        }
+
+        editSummary += `<@cdwb/${CDWB_TAGS.edit.skins.add}|${undocumentedCodes}>.`;
 
     }
     console.log(lines.join('\n'))
-   //await editArticlePromise("机械人测试", lines.join('\n'), editSummary, false);
+    await editArticlePromise("机械人测试", lines.join('\n'), editSummary, false);
 
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
