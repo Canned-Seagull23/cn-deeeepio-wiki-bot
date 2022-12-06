@@ -213,7 +213,7 @@ function uploadByUrlPromise(name: string, url: string, summary: string): Promise
         let realisticSkinEntries: Array<any> = [];
         let realisticRow: Array<any> = [];
         for (let i in realisticSection) {
-            if (realisticSection[i] == "|-" || Number(i) == realisticSection.length - 1) {
+            if (realisticSection[i] == "|-" || Number(i) == realisticSection.length) {
                 realisticSkinEntries.push(realisticRow);
                 realisticRow = [];
                 continue;
@@ -230,7 +230,7 @@ function uploadByUrlPromise(name: string, url: string, summary: string): Promise
 
         const seasonalStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.start)[0]!.line;
         const seasonalEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.seasonal.end)[0]!.line;
-        const seasonalSection = lines.slice(seasonalStartLn + 1, seasonalEndLn - 1);
+        const seasonalSection = lines.slice(seasonalStartLn + 1, seasonalEndLn);
 
         let seasonalSkinEntries: Array<any> = [];
         let seasonalRow: Array<any> = [];
@@ -251,7 +251,7 @@ function uploadByUrlPromise(name: string, url: string, summary: string): Promise
 
         const unrealisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.start)[0]!.line;
         const unrealisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.end)[0]!.line;
-        const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn - 1);
+        const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn);
 
         let unrealisticSkinEntries: Array<any> = [];
         let unrealisticRow: Array<any> = [];
@@ -320,7 +320,7 @@ function uploadByUrlPromise(name: string, url: string, summary: string): Promise
                 `|[[File:${skin.id}.png|100px|center]]`
             ]);
 
-            await uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
+           // await uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
 
         }
 
@@ -329,28 +329,26 @@ function uploadByUrlPromise(name: string, url: string, summary: string): Promise
         let offset = 0;
 
         lines.splice(
-            realisticStartLn + 1 + offset,
-            realisticEndLn - realisticStartLn - 2,
+            realisticStartLn + 1,
+            realisticEndLn - realisticStartLn - 1,
             ...realisticSection
         );
 
-        offset += realisticSection.length - (realisticEndLn - realisticStartLn - 2);
-
+        offset += realisticSection.length - (realisticEndLn - realisticStartLn - 1);
+        
         lines.splice(
             seasonalStartLn + 1 + offset,
-            seasonalEndLn - seasonalStartLn - 2,
+            seasonalEndLn - seasonalStartLn - 1,
             ...seasonalSection
         );
 
-        offset += seasonalSection.length - (seasonalEndLn - seasonalStartLn - 2);
+        offset += seasonalSection.length - (seasonalEndLn - seasonalStartLn - 1);
 
         lines.splice(
             unrealisticStartLn + 1 + offset,
-            unrealisticEndLn - unrealisticStartLn - 2,
+            unrealisticEndLn - unrealisticStartLn - 1,
             ...unrealisticSection
         );
-
-        offset += unrealisticSection.length - (unrealisticEndLn - unrealisticStartLn - 2);
 
         editSummary += `<@cdwb/${CDWB_TAGS.edit.skins.add}|${undocumentedSkins}>.`;
 
