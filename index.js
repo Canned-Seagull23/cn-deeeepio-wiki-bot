@@ -41,6 +41,12 @@ const CDWB_TAGS = {
         table: {
             end: "skintable/table/end"
         }
+    },
+    edit: {
+        skins: {
+            add: "edit/skins/add",
+            uploadimg: "edit/skins/uploadimg"
+        }
     }
 };
 // Data
@@ -97,6 +103,15 @@ function appendArticlePromise(title, content, summary) {
         });
     });
 }
+function uploadByUrlPromise(name, url, summary) {
+    return new Promise((resolve, reject) => {
+        client.uploadByUrl(name, url, summary, (err) => {
+            if (err)
+                reject(err);
+            resolve("");
+        });
+    });
+}
 (() => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     yield fetch(CONSTANTS.API_URL, "/animals")
@@ -141,6 +156,8 @@ function appendArticlePromise(title, content, summary) {
         };
     }
         }*/
+    let edit = false;
+    let editSummary = "";
     const animalId = 0;
     let skins = [];
     let undocumentedSkins = [];
@@ -158,7 +175,7 @@ function appendArticlePromise(title, content, summary) {
     seasonalSkins = skins.filter(skin => skin.category == "season");
     unrealisticSkins = skins.filter(skin => skin.category == "unrealistic");
     let d = yield getArticlePromise("机械人测试");
-    console.log(d);
+    //console.log(d);
     const lines = d.split('\n');
     let tags = [];
     for (let i in lines) {
@@ -219,7 +236,6 @@ function appendArticlePromise(title, content, summary) {
                 continue;
             documentedSkins.push(Number(seasonalSkinEntries[i][2].slice(1)));
         }
-        console.log(documentedSkins);
         const unrealisticStartLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.start)[0].line;
         const unrealisticEndLn = tags.filter(tag => tag.tag == CDWB_TAGS.skintable.unrealistic.end)[0].line;
         const unrealisticSection = lines.slice(unrealisticStartLn + 1, unrealisticEndLn - 1);
@@ -247,6 +263,8 @@ function appendArticlePromise(title, content, summary) {
             }
             ;
         }
+        if (!undocumentedSkins.length)
+            edit = true;
         for (let i in undocumentedSkins) {
             const skin = undocumentedSkins[i];
             let skinData = {};
@@ -287,11 +305,20 @@ function appendArticlePromise(title, content, summary) {
                 `|（自动翻译） ${skinDesc}`,
                 `|[[File:${skin.id}.png|100px|center]]`
             ]);
+            yield uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
         }
-        console.log(realisticSection);
-        console.log(seasonalSection);
-        console.log(unrealisticSection);
+        console.log(undocumentedSkins);
+        let offset = 0;
+        lines.splice(realisticStartLn + 1 + offset, realisticEndLn - realisticStartLn - 2, ...realisticSection);
+        offset += realisticSection.length - (realisticEndLn - realisticStartLn - 2);
+        lines.splice(seasonalStartLn + 1 + offset, seasonalEndLn - seasonalStartLn - 2, ...seasonalSection);
+        offset += seasonalSection.length - (seasonalEndLn - seasonalStartLn - 2);
+        lines.splice(unrealisticStartLn + 1 + offset, unrealisticEndLn - unrealisticStartLn - 2, ...unrealisticSection);
+        offset += unrealisticSection.length - (unrealisticEndLn - unrealisticStartLn - 2);
+        editSummary += `<@cdwb/${CDWB_TAGS.edit.skins.add}|${undocumentedSkins}>.`;
     }
+    console.log(lines.join('\n'));
+    //await editArticlePromise("机械人测试", lines.join('\n'), editSummary, false);
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
             .then(res => {
