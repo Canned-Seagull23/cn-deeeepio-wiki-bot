@@ -142,6 +142,9 @@ function imgExistsPromise(name: string): Promise<boolean> {
 
     // Get all animal articles
 
+    let edited = 0;
+    let uploaded = 0;
+
     for (let i in Object.keys(animals)) {
         const animalId = animals[i];
         const animalName = translations[animalId.name + "-name"];
@@ -316,6 +319,7 @@ function imgExistsPromise(name: string): Promise<boolean> {
 
                 await imgExistsPromise(skin.id + ".png").then(
                     async () => {
+                        uploaded++;
                         await uploadByUrlPromise(skin.id + ".png", "https://cdn.deeeep.io/custom/skins/" + skin.asset, "<@cdwb/edit/skins/uploadimg|" + skin.id);
                     }
                 ).catch(e => {
@@ -355,9 +359,11 @@ function imgExistsPromise(name: string): Promise<boolean> {
             editSummary += `<@cdwb/${CDWB_TAGS.edit.skins.add}|${undocumentedCodes}>.`;
 
         }
-        console.log(lines.join('\n'))
+        edited++;
         await editArticlePromise(animalName, lines.join('\n'), editSummary, false);
     }
+
+    console.log(`${edited} page(s) editted. ${uploaded} file(s) uploaded.`);
 
     /*
         await appendArticlePromise("机械人测试", "== TEST ==", "Test")
